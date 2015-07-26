@@ -1,0 +1,74 @@
+{% extends "base.html" %}{% load i18n %}{% load pagination_tag %}{% load htmlentities_tag %}{% load tagging_tags %}
+
+{% block customcss %}
+    {{ block.super }}
+    <link rel="stylesheet" href="/site_media/css/pagination.css" type="text/css" />
+{% endblock %}
+{% block customjs %}
+    {{ block.super }}
+    <script type="text/javascript" src="/site_media/js/jquery.galleria.js" />
+    <script type="text/javascript" src="/site_media/js/mygallery.js" />
+{% endblock %}
+
+{% block sidemenu %}
+{% if photo_list %}
+    <!-- paginator -->
+    <div class="paginator span-8 last">
+        <h1>{% autoescape off %}{{ title }}{% endautoescape %}</h1>
+        {% paginate photo_list page_num 8 5 objects %}
+        {% include 'pagination.html' %}
+    </div>
+
+    <div class="span-8 last">
+        <ul class="gallery_unstyled">
+            {% for photo in objects %}
+            {% if forloop.first %}<li class='active'>{% else %}<li>{% endif %}
+            <!--title is coded for HTML validation -->
+            <img src="{{ MEDIA_URL }}{{photo.image}}" alt="{{photo.title}}"
+                title='{% filter htmlentities %}
+                        <p>"<strong>{{photo.title|upper}}</strong>" published by
+                        <a title="Other photoes by {{photo.author}}" href="/user/{{photo.author}}">{{photo.author}}</a></p>
+                        {% if photo.caption %}
+                            <p><strong>caption: </strong>{{photo.caption}}</p>
+                        {% endif %}
+                        {% if photo.tag %}{% tags_for_object photo as tag_list %}
+                            <p><strong>tags: </strong>
+                            {% for tag in tag_list %}
+                                <a title="Other photoes tagged {{tag}}" href="/tag/{{tag}}">{{tag}}</a>
+                            {% endfor %}
+                            </p>
+                        {% endif %}
+                        {% ifequal logged_as photo.author %}
+                            <h1 class="editdelete">
+                                <a title="Edit your photo" href="/edit/{{photo.id}}"><strong>EDIT INFO</strong></a>
+                                -
+                                <a title="Delete your photo" href="/delete/{{photo.id}}"><strong>DELETE PHOTO</strong></a>
+                            </h1>
+                        {% endifequal %}
+                        {% endfilter %}'/></li>
+
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endif %}
+
+{% if request.user.is_authenticated %}
+    <div class="paginator span-8 last form">
+        <h1>{% autoescape off %}Add a photo{% endautoescape %}</h1>
+        <form enctype="multipart/form-data" method="post" action="">
+            {{ newform.as_p }}
+            <p><input type="submit" value="{% trans 'Add' %}"/></p>
+        </form>
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+{% if photo_list %}
+    <div class="span-16 last">
+        <div class="galleria_caption"></div>
+    </div>
+{% endif %}
+{% endblock %}

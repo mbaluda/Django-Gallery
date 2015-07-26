@@ -1,0 +1,6 @@
+.pagination { margin: 0px; padding: 0px; }
+.pagination span { margin: 0px; padding: 0px 10px 0px 0px; border-right: 1px solid #ccc; }
+.pagination ul { margin: 5px; padding: 0px; list-style: none; }
+.pagination li { margin: 0px 10px 0px 0px; padding: 0px; display: inline; }
+.pagination ul li a:hover { color: #FF5200; }
+.pagination_current { color: #FF5200; }

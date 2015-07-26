@@ -1,0 +1,142 @@
+/**\mainpage DjangoGallery Project
+
+\author Mauro Baluda (id: 67153101)\n mauro@bglug.it
+
+\section intro_sec Introduction
+
+This project is meant as an exercise in web development.\n
+My goal was to create a web system for management and condivision of photoes that allows the users to register, login and upload pictures on the internet.\n
+The system allows to view pictures from other users but permits to modify or delete only the self-owned ones.\n
+For this project I used Django SVN [1] a python based web framework which, although not easy to master, permits to speed up the web development process.\n
+
+\section system The system
+The obtained web application is very simple and intuitive, It presents a main menu for login/logof, register yourself as a new user, change your password and see your own uploaded photoes.\n
+On the left column 8 thumbnails of the uploaded images are shown, a pagination system permits to browse the whole collection.\n
+The center of the page is taken by the current picture and it's description; logged users can directly upload new images and if they are the current picture owner, they can delete and edit it using the red menu that appears.\n
+All the images can be tagged with words, every time that a tag or username is displayed, it is clickable and leads to a page where only the pictures with that specific tag/author are displayed.\n
+At the bottom of the page a tag cloud is displayed giving an idea of the actual content of the image database.\n
+
+\image html "../docimg/home.png"
+\image latex "../docimg/home.png" width=\textwidth
+
+The systems makes use of javascript but degrades well if it's disabled. The generated website has been validated for XHTML 1.1 strict compliance.\n
+
+\section tech Used technologies
+The system uses different technologies and projects that can be download from internet and used for free:\n
+- The layout of the web page is made using the css framework blueprintcss [2]\n
+- The tagging system is obtained integrating the project django-tagging [3]\n
+- The gallery visualization is done through Galleria [4]\n
+- several other parts of the code are taken from tutorials and examples on internet, mainly from djangosnippets [5], the exact source is cited in the code comments.
+
+\section implementation_sec Implementation
+The implementation is spread among various files in the project, in the following I will describe the most important and provide links to the code documentations
+
+\subsection urls Urls
+In the Urls file are specificated the legal urls of the web application; most of the important variables are passed to the python functions through URLS to make the resulting pages bookmarkable and searchengine-friendly. In particular the urls to search for images of a particualr user or tagged with a particular word are straightforward:\n
+\code
+www.website.com/user/username
+www.website.com/tag/tagname
+\endcode
+
+related code: djangogallery::urls.urlpatterns
+
+\subsection settings Settings
+To make a custom installation of the djangogallery is necessary to change some settings:\n
+in settings.py\n
+-TEMPLATE_DIRS\n
+-MEDIA_ROOT
+
+in urls.py\n
+-sitemedia urls
+
+\subsection model Models
+The Photo model contains an ImageField to store the photo url (that changes with the upload date), fields to store some informations on the picture, the author and the associated tags. Django SVN uploads the file on the web automatically.\n
+To allow only the legitimate owner to modify or delete a photo we had to modify the functions save and delete, they use the middleware threadlocals.py to determine the active user.
+
+related code: models.py threadlocals.py
+
+\subsection forms Forms
+The Forms associated to the model are mainly produced automatically but we had to decide which field we wanted displayed.\n
+The forms used for user/session management was taken from the project django-profile [6] that does much more than what we needed
+
+related code: forms.py
+
+\section views Views and templates
+Views and templates encode the web site logic, the site layout is controlled by the base template that is eredited by all the others.
+
+\subsection indextemplate index view/template
+The principal view is the index view which displays the needed images eventually filtered by author or tag and permits the logged users to upload new images.\n
+The index view is associated with the template index.html which uses the galleria javascript application and the django paginator to generate the main gallery page, the template also displays the image infos and and the tag cloud and a form to let the logged user upload a new image.\n
+The template is aware if a user is logged in and if he's viewing an image he uploaded, in this case it displays the controls needed to modify or delete the image.\n
+Here I recall the main structure of the index template:
+\code
+<!-- if the view pass some images -->
+{% if photo_list %}
+    <!-- display the paginator: 8 images per page max-->
+        {% paginate photo_list page_num 8 5 objects %}
+        {% include 'pagination.html' %}
+
+    <!-- for each photo display the infos it carries-->
+        {% for photo in objects %}
+        <!--infos are coded for HTML validation -->
+    <!-- if the user is the author of the photo display edit controls-->
+        {% ifequal logged_as photo.author %}
+            <h1 class="editdelete">...</h1>
+{% endif %}
+
+<!-- if the user is authenticated permit to add a new photo-->
+{% if request.user.is_authenticated %}
+    <h1>{% autoescape off %}Add a photo{% endautoescape %}</h1>
+    <form enctype="multipart/form-data" method="post" action="">
+        {{ newform.as_p }}
+        <p><input type="submit" value="{% trans 'Add' %}"/></p>
+    </form>
+{% endif %}
+\endcode
+
+related code: views.py
+
+\subsection otherviews Other views/templates
+The templates "login" "register" and "changepasswd" are very simple and just display the appropriate form generated by the related view, "tagcloud" and "pagination" are adapted from the relative projects documentation.\n
+The "edit" view/template permits to the actual owner to change the infos and the tags of his pictures and updates the model consequentely.
+
+related code: views.py
+
+\section js javascripts
+The only javascript used is for the gallery visualization, it is produced by the project Galleria [4] which is based on the library JQuery [7].
+The actual gallery behaviour is controlled by a custom javascript file: mygallery.js who describes the desired effects for the image and thumbnail appearing/disappearing
+
+related code: mygallery.js
+
+\section todo_sec Todo
+The resulting website is quite satisfactory but could be improved in the design side and in the image file management: the files uploaded don't have at the moment a silze limit, the resized version and the thumbnails are generated on the client from the css instructions, it wuold be useful to take this elaboration on the server side also to minimize the page loading time.
+
+\section documentation_sec Documentation
+The project and the code documentation was written using doxygen [8] a multi-language documentation system.\n
+The HTML and latex documentation can be generated typing "doxygen" int the main folder.
+
+\section links Resources
+[1] Django Project.\n
+http://www.djangoproject.com/
+
+[2] BlueprintCSS.\n
+http://code.google.com/p/blueprintcss/
+
+[3] django-tagging.\n
+http://code.google.com/p/django-tagging/
+
+[4] Galleria.\n
+http://monc.se/galleria/
+
+[5] djangosnippets.\n
+http://www.djangosnippets.org/
+
+[6] django-profile.\n
+http://code.google.com/p/django-profile/
+
+[7] JQuery a new type of javascript library.\n
+http://jquery.com/
+
+[8] Doxygen.\n
+http://www.stack.nl/~dimitri/doxygen/
+*/

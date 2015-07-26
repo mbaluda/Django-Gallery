@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% load i18n %}
+
+
+{% block sidemenu %}
+    <div class="paginator span-8 last form">
+        <h1>{% autoescape off %}{{ title }}{% endautoescape %}</h1>
+        <form enctype="multipart/form-data" method="post" action="">
+            {{ form.as_p }}
+            <p><input type="submit" value="{% trans 'Update Info' %}"/></p>
+        </form>
+    </div>
+{% endblock %}
+{% block content %}
+    <img class="replaced" src="/site_media/{{ oldphoto.image }}" alt="{{ oldphoto.title }}" title="{{ oldphoto.title }}"/>
+{% endblock %}

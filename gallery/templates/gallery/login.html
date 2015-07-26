@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load i18n %}
+
+{% block content %}
+<div class="paginator span-16 last form">
+    <h1>login form</h1>
+    <form method="post" action="">
+        {{ loginform.as_p }}
+        <p><input type="submit" value="{% trans 'Login' %}"/></p>
+    </form>
+</div>
+{% endblock %}

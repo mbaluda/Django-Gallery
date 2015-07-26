@@ -1,0 +1,5 @@
+{% load tagging_tags %}
+    {% tag_cloud_for_model gallery.Photo as tag_list with steps=5 %}
+    <p>{% for tag in tag_list %}
+        <a href="/tag/{{ tag }}" title="Other pictures tagged {{tag}}" class="importance{{ tag.font_size }}">{{ tag }}</a>
+    {% endfor %}</p>
