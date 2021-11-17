@@ -18,9 +18,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
     - name: Generate SonarCloud sarif report
-      uses: benoit-sns/sarif-sonarcloud@master
+      uses: marcin-majewski-sonarsource/sarif-sonarcloud@master
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}} # token to call the sonarcloud api
         #REPORT_PATH: <path-to-report-path> # Path to the report-task.txt file generated when running the scanner. Optional unless you did not run the scanner in the workspace directory.
