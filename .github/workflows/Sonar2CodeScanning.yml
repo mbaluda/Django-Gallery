@@ -1,0 +1,41 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Sonar2CodeScanning
+on:
+  workflow_dispatch: #for testing
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        
+    - name: SonarCloud Scan # Use appropriate scanner if your project contains languages not compatible with sonar-scanner-cli ()Java/C#,C,C++ etc...)
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    - name: Generate SonarCloud sarif report
+      uses: benoit-sns/sarif-sonarcloud@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}} # token to call the sonarcloud api
+        #REPORT_PATH: <path-to-report-path> # Path to the report-task.txt file generated when running the scanner. Optional unless you did not run the scanner in the workspace directory.
+    - name: Upload sarif report
+      uses: Anthophila/codeql-action/codeql/upload-sarif@master
+      with:
+        sarif_file: sonarcloud-output.sarif.json
+
+    # Upload the SARIF file generated in the previous step
+    - name: Upload SARIF results file
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: sonarcloud-output.sarif.json
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: results.sarif
+        sarif_file: sonarcloud-output.sarif.json
