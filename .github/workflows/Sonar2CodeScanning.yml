@@ -24,12 +24,6 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}} # token to call the sonarcloud api
         #REPORT_PATH: <path-to-report-path> # Path to the report-task.txt file generated when running the scanner. Optional unless you did not run the scanner in the workspace directory.
-    - name: Upload sarif report
-      uses: Anthophila/codeql-action/codeql/upload-sarif@master
-      with:
-        sarif_file: sonarcloud-output.sarif.json
-
-    # Upload the SARIF file generated in the previous step
     - name: Upload SARIF results file
       uses: github/codeql-action/upload-sarif@v1
       with:
